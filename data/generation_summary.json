@@ -1,0 +1,12 @@
+{
+    "num_customers": 2500,
+    "num_orders": 16977,
+    "num_refunds": 3428,
+    "abusive_rate": 0.44078179696616104,
+    "archetype_counts": {
+        "normal": 1750,
+        "loyal_hf": 375,
+        "wardrober": 250,
+        "serial_abuser": 125
+    }
+}

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RECIDIAN // SYSTEM ARCHITECTURE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Load Mermaid JS for Architecture Diagram -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true, theme: 'dark', themeVariables: { primaryColor: '#00f3ff', edgeLabelBackground:'#0a1128', tertiaryColor: '#1e293b' }});</script>
+    
+    <style>
+        :root {
+            --bg-base: #030612;
+            --bg-surface: #0a1128;
+            --cyan-glow: #00f3ff;
+            --purple-glow: #bc13fe;
+            --text-main: #e2e8f0;
+            --text-dim: #64748b;
+            
+            --border-neon: 1px solid rgba(0, 243, 255, 0.3);
+            --shadow-neon: 0 0 20px rgba(0, 243, 255, 0.15);
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            font-family: 'Rajdhani', sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: bg-pan 20s linear infinite;
+        }
+
+        @keyframes bg-pan {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 40px; }
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-base); }
+        ::-webkit-scrollbar-thumb { background: var(--cyan-glow); border-radius: 4px; }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 5rem;
+            position: relative;
+        }
+
+        .glitch-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--text-main);
+            text-shadow: 3px 0 var(--cyan-glow), -3px 0 var(--purple-glow);
+            margin: 0;
+            letter-spacing: -2px;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-top: 1rem;
+        }
+
+        .sys-status {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 0.5rem 2rem;
+            border: var(--border-neon);
+            color: var(--cyan-glow);
+            font-family: 'JetBrains Mono', monospace;
+            border-radius: 4px;
+            background: rgba(0, 243, 255, 0.05);
+            box-shadow: var(--shadow-neon);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); }
+            50% { box-shadow: 0 0 25px rgba(0, 243, 255, 0.6); }
+            100% { box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); }
+        }
+
+        /* SECTIONS */
+        .module {
+            background: rgba(10, 17, 40, 0.85);
+            backdrop-filter: blur(10px);
+            border-left: 4px solid var(--cyan-glow);
+            padding: 3rem;
+            margin-bottom: 4rem;
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            border-radius: 0 16px 16px 0;
+        }
+
+        .module::before, .module::after {
+            content: '';
+            position: absolute;
+            left: 0; width: 100%; height: 1px;
+            background: linear-gradient(90deg, var(--cyan-glow), transparent);
+        }
+        .module::before { top: 0; }
+        .module::after { bottom: 0; }
+
+        h2 {
+            font-size: 2.2rem;
+            margin-top: 0;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 1px dashed rgba(0, 243, 255, 0.2);
+            padding-bottom: 1rem;
+        }
+
+        h2 span.num {
+            color: var(--cyan-glow);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.4rem;
+        }
+
+        p {
+            font-size: 1.15rem;
+            color: #94a3b8;
+            margin-bottom: 1.5rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        /* VISUAL REPRESENTATIONS */
+        .mermaid-container {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .chart-grid img {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            background: white; /* Charts are rendered white by matplotlib */
+        }
+        
+        .chart-grid img:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+        }
+
+        .stat-box {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0,243,255,0.2);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--cyan-glow);
+            text-transform: uppercase;
+        }
+
+        .stat-val {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 0.5rem 0;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+
+        .btn-back {
+            display: block;
+            width: max-content;
+            margin: 0 auto 3rem auto;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            transition: color 0.3s, text-shadow 0.3s;
+        }
+        .btn-back:hover { 
+            color: var(--cyan-glow); 
+            text-shadow: 0 0 8px var(--cyan-glow);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="index.html" class="btn-back">< RETURN TO DASHBOARD</a>
+
+        <header>
+            <h1 class="glitch-text">RECIDIAN_CORE</h1>
+            <div class="subtitle">Methodology, Visuals & Architecture</div>
+            <div class="sys-status">STATUS: DEPLOYED // TRACK 02 ALIGNED</div>
+        </header>
+
+        <!-- WHAT MAKES IT SPECIAL -->
+        <div class="module" style="border-left-color: var(--purple-glow); background: rgba(20, 10, 40, 0.85);">
+            <h2><span class="num" style="color:var(--purple-glow)">00</span> The RECIDIAN Edge</h2>
+            <p style="color: #fff; font-size: 1.25rem;">Why does this project stand out for the AI Risk Manager Track?</p>
+            <ul style="color: #cbd5e1; font-size: 1.15rem; line-height: 1.8;">
+                <li><strong>It solves a multi-billion dollar problem:</strong> Payment gateways don't currently protect merchants from return abuse (wardrobing, promo harvesting). We built that missing layer.</li>
+                <li><strong>It's not just a black box:</strong> Real FinTech requires explainability for dispute handling. We integrated SHAP waterfalls to explicitly justify every blocked refund.</li>
+                <li><strong>We optimized for Business Loss:</strong> We didn't maximize arbitrary ML accuracy. We mathematically swept thresholds to find the exact point that minimizes False Positive/Negative <i>cash loss</i>.</li>
+            </ul>
+        </div>
+
+        <!-- MODULE 01: ARCHITECTURE DIAGRAM -->
+        <div class="module">
+            <h2><span class="num">01</span> Live Razorpay Architecture</h2>
+            <p>RECIDIAN is strictly defense-only. It acts as an API interceptor listening to Razorpay's Test servers, intercepting the <code>/v1/refunds</code> payload, synthesizing historical velocity, and returning a SHAP-explained verdict in &lt;2 seconds.</p>
+            
+            <div class="mermaid-container" style="overflow-x: auto; padding: 1rem; background: rgba(0,0,0,0.6);">
+                <div class="mermaid">
+                    %%{init: {'theme': 'base', 'themeVariables': { 'lineColor': '#bc13fe' }}}%%
+                    graph LR
+                        A[Razorpay UI] --> B(Create Order & Pay)
+                        B --> C{Refund Requested}
+                        C --> D[POST /request-refund]
+                        D --> E[FastAPI Interceptor]
+                        
+                        E --> F{Rule Layer}
+                        F -->|Trigger| G[FLAG: HIGH RISK]
+                        F -->|Pass| H[XGBoost Engine]
+                        
+                        H --> I[SHAP Explainer]
+                        I --> J{Score >= 0.69?}
+                        J -->|Yes| K[Webhook Alert]
+                        J -->|No| L[Approve Return]
+                        
+                        G -.-> M[(SQLite Audit)]
+                        K -.-> M
+                        L -.-> M
+                        
+                        classDef default fill:#050914,stroke:#00f3ff,stroke-width:2px,color:#00f3ff,rx:8,ry:8;
+                        classDef ml fill:#0a0514,stroke:#bc13fe,stroke-width:2px,color:#bc13fe,rx:8,ry:8;
+                        classDef db fill:#05140a,stroke:#22c55e,stroke-width:2px,color:#22c55e,rx:8,ry:8;
+                        
+                        class H,I ml;
+                        class M db;
+                </div>
+            </div>
+        </div>
+
+        <!-- MODULE 02: SYNTHETIC DATA -->
+        <div class="module">
+            <h2><span class="num">02</span> Archetype-Driven Synthesis</h2>
+            <p>Because real fraud datasets are illegal to distribute, we reverse-engineered 20,400+ transactions adhering strictly to <strong>Razorpay's JSON API schema</strong> using four strict behavioral archetypes.</p>
+            
+            <div class="grid-2" style="margin-top: 2rem;">
+                <div class="stat-box">
+                    <div class="stat-label">Dataset Volume</div>
+                    <div class="stat-val">20,405</div>
+                    <div style="font-size: 0.9rem; color: #64748b;">Orders & Refunds Synthesized</div>
+                </div>
+                <div class="stat-box" style="border-color: rgba(188, 19, 254, 0.4);">
+                    <div class="stat-label">Hard Negative Strategy</div>
+                    <div class="stat-val">Loyal HF</div>
+                    <div style="font-size: 0.9rem; color: #64748b;">Forced the ML to learn complex nuance</div>
+                </div>
+            </div>
+
+            <p style="margin-top: 2rem; margin-bottom: 0;"><strong>The 4 Archetypes:</strong> Normal (Low returns), Loyal High-Frequency (High buys, High returns), Wardrobers (High-value returns only), and Promo Abusers (Instant returns).</p>
+        </div>
+
+        <!-- MODULE 03: ML & EVALUATION METRICS -->
+        <div class="module">
+            <h2><span class="num">03</span> Model Evaluation Metrics</h2>
+            <p>We trained an XGBoost classifier on an 80/20 held-out test set. The model achieved exceptional class separation, proving highly resilient against class imbalance (PR-AUC 0.940).</p>
+            
+            <div class="chart-grid">
+                <div>
+                    <img src="roc_curve.png" alt="ROC Curve">
+                    <div style="text-align:center; font-family: monospace; font-size:0.85rem; color:#64748b; margin-top:5px;">Receiver Operating Characteristic (ROC)</div>
+                </div>
+                <div>
+                    <img src="pr_curve.png" alt="PR Curve">
+                    <div style="text-align:center; font-family: monospace; font-size:0.85rem; color:#64748b; margin-top:5px;">Precision-Recall (PR) Curve</div>
+                </div>
+                <div>
+                    <img src="confusion_matrix.png" alt="Confusion Matrix">
+                    <div style="text-align:center; font-family: monospace; font-size:0.85rem; color:#64748b; margin-top:5px;">Confusion Matrix @ Threshold 0.69</div>
+                </div>
+                <div>
+                    <img src="shap_summary.png" alt="SHAP Global Importance">
+                    <div style="text-align:center; font-family: monospace; font-size:0.85rem; color:#64748b; margin-top:5px;">SHAP Global Feature Importance</div>
+                </div>
+            </div>
+            
+            <div class="grid-2" style="margin-top: 2rem;">
+                <div class="stat-box" style="border-color: rgba(34, 197, 94, 0.4);">
+                    <div class="stat-label">Precision</div>
+                    <div class="stat-val">94.3%</div>
+                </div>
+                <div class="stat-box" style="border-color: rgba(59, 130, 246, 0.4);">
+                    <div class="stat-label">Recall</div>
+                    <div class="stat-val">93.0%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODULE 04: COST THRESHOLDING -->
+        <div class="module">
+            <h2><span class="num">04</span> Financial Cost Optimization</h2>
+            <p>Standard ML projects optimize for arbitrary accuracy. <strong>We optimized for the merchant's bank account.</strong> We assigned a financial penalty to False Positives (insulting a good customer) and False Negatives (shipping cost + loss), and swept 100 thresholds.</p>
+            
+            <div class="grid-2" style="margin-bottom: 1.5rem;">
+                <div class="stat-box" style="border-color: rgba(233, 75, 75, 0.5);">
+                    <div class="stat-label">False Negative Penalty</div>
+                    <div class="stat-val" style="font-size: 2rem;">₹2,000</div>
+                </div>
+                <div class="stat-box" style="border-color: rgba(245, 166, 35, 0.5);">
+                    <div class="stat-label">False Positive Penalty</div>
+                    <div class="stat-val" style="font-size: 2rem;">₹500</div>
+                </div>
+            </div>
+
+            <p style="text-align: center; font-size: 1.25rem; color: #fff;">The mathematical minimum cost (₹36,550) occurred exactly at <strong style="color:var(--cyan-glow); font-size: 1.5rem;">Threshold = 0.69</strong>. That is the engine's core constraint.</p>
+        </div>
+
+        <div style="text-align: center; margin-top: 5rem;">
+            <div class="glitch-text" style="font-size: 2rem; color: var(--text-dim); text-shadow: none;">[ SYSTEM HALTED ]</div>
+        </div>
+    </div>
+
+</body>
+</html>

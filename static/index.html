@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RECIDIAN | AI Risk Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            /* Razorpay-inspired Light Theme */
+            --bg-page: #f4f7f9;
+            --bg-card: #ffffff;
+            --text-main: #1c213f;
+            --text-muted: #5e6d82;
+            --rzp-blue: #3385ff;
+            --rzp-dark-blue: #02042b;
+            --border-color: #e2e8f0;
+            
+            --risk-low: #0fa457;
+            --risk-medium: #f5a623;
+            --risk-high: #e94b4b;
+            
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 12px 24px rgba(2, 4, 43, 0.1);
+            
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* The Container fixes the ultra-wide stretching issue */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* --- HERO HEADER --- */
+        .hero {
+            background: linear-gradient(135deg, var(--rzp-dark-blue) 0%, #0a1340 100%);
+            color: white;
+            padding: 4rem 0;
+            margin-bottom: -3rem; /* overlap with KPIs */
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .hero-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin: 0 0 0.5rem 0;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .hero h1 span {
+            color: var(--rzp-blue);
+        }
+
+        .hero p.subtitle {
+            font-size: 1.1rem;
+            color: #a0aec0;
+            max-width: 600px;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .track-badge {
+            background: rgba(51, 133, 255, 0.2);
+            color: #72aaff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px solid rgba(51, 133, 255, 0.4);
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        /* --- KPI GRID --- */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            border-top: 4px solid var(--rzp-blue);
+        }
+
+        .kpi-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--rzp-dark-blue);
+            line-height: 1;
+        }
+        
+        .kpi-sub {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--risk-low);
+            font-weight: 500;
+        }
+
+        /* --- MAIN DASHBOARD LAYOUT --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: var(--rzp-dark-blue);
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* --- FORMS & BUTTONS --- */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.85rem;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--rzp-blue);
+            box-shadow: 0 0 0 3px rgba(51, 133, 255, 0.1);
+        }
+
+        button {
+            background: var(--rzp-blue);
+            color: #fff;
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(51, 133, 255, 0.2);
+        }
+
+        button:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 12px rgba(51, 133, 255, 0.3);
+        }
+
+        .console-log {
+            margin-top: 1.5rem;
+            background: #0f172a;
+            color: #38bdf8;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            height: 160px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        /* --- RISK GAUGE & SHAP --- */
+        .risk-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: auto;
+        }
+
+        .risk-gauge {
+            --score: 0;
+            --color: var(--risk-low);
+            width: 160px; height: 160px;
+            border-radius: 50%;
+            background: conic-gradient(var(--color) calc(var(--score) * 3.6deg), #e2e8f0 0);
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+            margin-bottom: 1.5rem;
+            transition: background 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .risk-gauge::before {
+            content: ''; width: 130px; height: 130px;
+            border-radius: 50%; background: var(--bg-card);
+            position: absolute;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .score-text {
+            position: relative; z-index: 1;
+            font-family: 'JetBrains Mono', monospace; 
+            font-size: 2.5rem;
+            font-weight: 700; 
+            color: var(--text-main);
+        }
+
+        .risk-band {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 24px; border-radius: 999px;
+            font-size: 0.9rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .risk-band--low    { background: #dcfce7; color: #166534; }
+        .risk-band--medium { background: #fef3c7; color: #92400e; }
+        .risk-band--high   { background: #fee2e2; color: #991b1b; }
+
+        .shap-reasons {
+            margin-top: 1.5rem;
+            width: 100%;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .shap-reason {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+        .shap-reason:last-child { border: none; padding-bottom: 0; }
+        .shap-reason span.feature { color: var(--text-main); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
+        .shap-reason span.up { color: var(--risk-high); font-weight: 600; }
+        .shap-reason span.down { color: var(--risk-low); font-weight: 600; }
+
+        .alert-banner {
+            display: none;
+            background: #fef2f2;
+            border-left: 4px solid var(--risk-high);
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 4px;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        /* --- TABLES & CHARTS --- */
+        .full-width { grid-column: 1 / -1; }
+
+        .data-table {
+            width: 100%; border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        .data-table th {
+            background: #f1f5f9;
+            padding: 12px 16px; text-align: left;
+            font-weight: 600; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.5px;
+            font-size: 0.75rem; 
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .data-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main); 
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .chart-img {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: white; /* Ensure crisp background for PNGs */
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* --- PORTFOLIO BENTO GRID --- */
+        .portfolio-section {
+            margin-top: 4rem;
+            padding-top: 3rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .portfolio-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .portfolio-header h2 {
+            font-size: 2.2rem;
+            color: var(--rzp-dark-blue);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .portfolio-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .bento-card {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .bento-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: #cbd5e1;
+        }
+
+        .bento-large {
+            grid-column: span 2;
+        }
+
+        .bento-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: rgba(51, 133, 255, 0.1);
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        .bento-card h3 {
+            color: var(--text-main);
+            margin-top: 0;
+            margin-bottom: 0.75rem;
+            font-size: 1.25rem;
+        }
+
+        .bento-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HERO SECTION -->
+    <div class="hero">
+        <div class="container hero-inner">
+            <div>
+                <div class="track-badge">Track 02: AI Risk Manager</div>
+                <h1>RECIDIAN <span>|</span> Risk Engine</h1>
+                <p class="subtitle">A strictly defense-only ML risk scorer for Razorpay refunds. Detects return abuse using a Hybrid Rule + XGBoost engine, optimized for false-positive business cost.</p>
+            </div>
+            <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 1rem;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #4ade80;">
+                    ● System Online & Connected
+                </div>
+                <a href="https://github.com/dsouzkie/Recidian" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; text-decoration: none; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; font-size: 0.9rem; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    View Source on GitHub
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="container">
+        
+        <!-- KPIs -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Precision (Test Set)</div>
+                <div class="kpi-value" id="kpi-precision">--%</div>
+                <div class="kpi-sub">Highly accurate flagging</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Recall (Test Set)</div>
+                <div class="kpi-value" id="kpi-recall">--%</div>
+                <div class="kpi-sub">Of total fraud caught</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Total FP Cost Minimized</div>
+                <div class="kpi-value" id="kpi-fpcost">INR --</div>
+                <div class="kpi-sub">Cost-optimized via Threshold</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Decision Threshold</div>
+                <div class="kpi-value" id="kpi-threshold">0.69</div>
+                <div class="kpi-sub">Mathematically derived optimal point</div>
+            </div>
+        </div>
+
+        <!-- DASHBOARD GRID -->
+        <div class="dashboard-grid">
+            
+            <!-- LIVE DEMO COLUMN -->
+            <div class="card">
+                <h2>Live Razorpay Integration Demo</h2>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+                    This triggers a real API flow to Razorpay Test servers. It creates an Order, captures a Mock Payment, and executes a real Refund.
+                </p>
+                
+                <div class="form-group">
+                    <label>Amount (Paise) <span style="font-weight: normal; color: var(--text-muted);">- Note: Wardrobers target high values > 100000</span></label>
+                    <input type="number" id="demo_amount" value="149900">
+                </div>
+                
+                <div class="form-group">
+                    <label>Stated Return Reason</label>
+                    <select id="demo_reason">
+                        <option value="changed_mind">Changed Mind (Suspicious for high-value)</option>
+                        <option value="damaged">Item Damaged (Normal behavior)</option>
+                        <option value="wrong_size">Wrong Size (Normal behavior)</option>
+                        <option value="not_as_described">Not as Described</option>
+                    </select>
+                </div>
+                
+                <button onclick="runLiveDemo()" id="demo_btn">Execute Refund & Score</button>
+                
+                <div id="demo_logs" class="console-log">> System ready. Waiting for execution...</div>
+            </div>
+
+            <!-- RISK ENGINE COLUMN -->
+            <div class="card">
+                <h2>Live AI Assessment & Explainability</h2>
+                
+                <div class="alert-banner" id="webhook_alert">
+                    [WEBHOOK FIRED] - High Risk Return Intercepted! Notification sent to merchant.
+                </div>
+
+                <div class="risk-display">
+                    <div class="risk-gauge" id="main_gauge">
+                        <div class="score-text" id="score_text">--%</div>
+                    </div>
+                    <div class="risk-band risk-band--low" id="band_badge" style="background: #e2e8f0; color: #475569;">AWAITING DATA</div>
+                    
+                    <div class="shap-reasons" id="shap_container">
+                        <div class="shap-reason" style="justify-content: center; color: var(--text-muted); font-style: italic;">
+                            SHAP Feature Contributions will appear here...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHARTS -->
+            <div class="card full-width">
+                <h2>Model Performance & Cost Analytics</h2>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                    These metrics prove RECIDIAN meets the strict Track 02 Bar: measured precision, recall, and honest false-positive cost accounting on a held-out test set.
+                </p>
+                <div class="charts-grid">
+                    <img src="/static/roc_curve.png" class="chart-img" alt="ROC Curve">
+                    <img src="/static/pr_curve.png" class="chart-img" alt="PR Curve">
+                    <img src="/static/confusion_matrix.png" class="chart-img" alt="Confusion Matrix">
+                    <img src="/static/shap_summary.png" class="chart-img" alt="SHAP Summary">
+                </div>
+            </div>
+
+            <!-- AUDIT LOG -->
+            <div class="card full-width">
+                <h2>Immutable Audit Log (SQLite)</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Refund ID</th>
+                            <th>Risk Score</th>
+                            <th>Verdict</th>
+                            <th>Scoring Layer</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody id="audit_body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+        
+        </div>
+        
+        <!-- LINK TO FUTURISTIC PORTFOLIO -->
+        <div style="text-align: center; margin-top: 4rem; padding-top: 3rem; border-top: 1px solid var(--border-color);">
+            <a href="#" onclick="triggerTransition(event)" style="display: inline-block; padding: 1rem 3rem; background: linear-gradient(90deg, #1e293b, #0f172a); color: #00f3ff; text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; font-weight: 700; border-radius: 4px; border: 1px solid #00f3ff; box-shadow: 0 0 15px rgba(0, 243, 255, 0.2); text-transform: uppercase; letter-spacing: 2px; transition: all 0.3s;">
+                > INITIALIZE FULL METHODOLOGY DEEP-DIVE_
+            </a>
+        </div>
+    </div>
+    
+    <!-- CYBER TRANSITION OVERLAY -->
+    <div id="cyber-transition" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #030612; z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center; color: #00f3ff; font-family: 'JetBrains Mono', monospace;">
+        <h2 id="transition-text" style="font-size: 2rem; letter-spacing: 4px; text-shadow: 0 0 10px #00f3ff;">ENGAGING SYSTEM OVERRIDE...</h2>
+        <div style="width: 400px; height: 4px; background: #1e293b; margin-top: 30px; border-radius: 2px; overflow: hidden;">
+            <div id="transition-bar" style="width: 0%; height: 100%; background: #00f3ff; box-shadow: 0 0 15px #00f3ff; transition: width 0.3s ease-out;"></div>
+        </div>
+    </div>
+
+    <script>
+        function triggerTransition(e) {
+            e.preventDefault();
+            const overlay = document.getElementById('cyber-transition');
+            const bar = document.getElementById('transition-bar');
+            const text = document.getElementById('transition-text');
+            
+            overlay.style.display = 'flex';
+            
+            setTimeout(() => { bar.style.width = '30%'; text.innerText = 'BYPASSING FIREWALL...'; }, 300);
+            setTimeout(() => { bar.style.width = '75%'; text.innerText = 'DECRYPTING METHODOLOGY DIAGRAMS...'; }, 800);
+            setTimeout(() => { bar.style.width = '100%'; text.innerText = 'ACCESS GRANTED.'; }, 1200);
+            setTimeout(() => { window.location.href = 'portfolio.html'; }, 1500);
+        }
+        const API_BASE = 'http://localhost:8000';
+
+        // Load initial data
+        async function init() {
+            try {
+                const res = await fetch(`${API_BASE}/metrics`);
+                const metrics = await res.json();
+                
+                document.getElementById('kpi-precision').innerText = (metrics.precision * 100).toFixed(1) + '%';
+                document.getElementById('kpi-recall').innerText = (metrics.recall * 100).toFixed(1) + '%';
+                document.getElementById('kpi-fpcost').innerText = '₹' + metrics.total_fp_cost.toLocaleString();
+                
+                fetchAuditLogs();
+            } catch (err) {
+                console.error("Failed to fetch initial data", err);
+            }
+        }
+
+        async function fetchAuditLogs() {
+            try {
+                const res = await fetch(`${API_BASE}/audit?limit=5`);
+                const logs = await res.json();
+                
+                const tbody = document.getElementById('audit_body');
+                tbody.innerHTML = '';
+                
+                logs.forEach(log => {
+                    const tr = document.createElement('tr');
+                    
+                    let bandClass = 'risk-band--low';
+                    if(log.band === 'High') bandClass = 'risk-band--high';
+                    if(log.band === 'Medium') bandClass = 'risk-band--medium';
+                    
+                    tr.innerHTML = `
+                        <td>${log.order_id || 'N/A'}</td>
+                        <td>${log.refund_id || 'N/A'}</td>
+                        <td style="font-weight: 700;">${(log.score * 100).toFixed(1)}%</td>
+                        <td><span class="risk-band ${bandClass}" style="padding: 4px 12px; font-size: 0.75rem;">${log.band}</span></td>
+                        <td>${log.triggered_by}</td>
+                        <td style="color: #64748b; font-size: 0.8rem;">${new Date(log.timestamp).toLocaleString()}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (e) {
+                console.error("Failed to load audit logs", e);
+            }
+        }
+
+        function updateGauge(score, band, shap_values) {
+            const gauge = document.getElementById('main_gauge');
+            const scoreText = document.getElementById('score_text');
+            const badge = document.getElementById('band_badge');
+            const shapContainer = document.getElementById('shap_container');
+            const alertBanner = document.getElementById('webhook_alert');
+            
+            const pct = Math.round(score * 100);
+            scoreText.innerText = pct + '%';
+            
+            let color = 'var(--risk-low)';
+            let bandClass = 'risk-band--low';
+            
+            if(band === 'High') {
+                color = 'var(--risk-high)';
+                bandClass = 'risk-band--high';
+                alertBanner.style.display = 'block';
+            } else {
+                alertBanner.style.display = 'none';
+                if(band === 'Medium') {
+                    color = 'var(--risk-medium)';
+                    bandClass = 'risk-band--medium';
+                }
+            }
+            
+            gauge.style.setProperty('--score', pct);
+            gauge.style.setProperty('--color', color);
+            
+            badge.className = `risk-band ${bandClass}`;
+            badge.innerText = band.toUpperCase() + ' RISK';
+            
+            // Render SHAP
+            shapContainer.innerHTML = '';
+            if (shap_values && shap_values.length > 0) {
+                let title = document.createElement('div');
+                title.style.fontSize = '0.75rem';
+                title.style.textTransform = 'uppercase';
+                title.style.letterSpacing = '1px';
+                title.style.color = 'var(--text-muted)';
+                title.style.marginBottom = '0.5rem';
+                title.innerText = 'SHAP Feature Contributions:';
+                shapContainer.appendChild(title);
+                
+                shap_values.forEach(sv => {
+                    const div = document.createElement('div');
+                    div.className = 'shap-reason';
+                    const isUp = sv.contribution > 0;
+                    const direction = isUp ? '↑ Increased Risk' : '↓ Decreased Risk';
+                    const colorClass = isUp ? 'up' : 'down';
+                    div.innerHTML = `<span class="feature">${sv.feature} (${sv.value})</span> <span class="${colorClass}">${direction}</span>`;
+                    shapContainer.appendChild(div);
+                });
+            } else {
+                shapContainer.innerHTML = `<div class="shap-reason" style="color: var(--text-muted);">Rule-based trigger (No SHAP).</div>`;
+            }
+        }
+
+        function logStep(msg) {
+            const div = document.getElementById('demo_logs');
+            div.innerText += `\n> ${msg}`;
+            div.scrollTop = div.scrollHeight;
+        }
+
+        async function runLiveDemo() {
+            const btn = document.getElementById('demo_btn');
+            btn.disabled = true;
+            btn.innerText = 'Processing via Razorpay API...';
+            document.getElementById('demo_logs').innerText = '> Executing live test sequence...';
+            
+            const amt = parseInt(document.getElementById('demo_amount').value);
+            const reason = document.getElementById('demo_reason').value;
+            
+            try {
+                // 1. Create Order
+                logStep("POST /razorpay/create-order...");
+                const orderRes = await fetch(`${API_BASE}/razorpay/create-order`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ amount: amt, category: "electronics", product_name: "Test Item" })
+                });
+                const order = await orderRes.json();
+                logStep(`Order created: ${order.id}`);
+                
+                // 2. Simulate Payment
+                logStep("POST /razorpay/verify-payment...");
+                const payRes = await fetch(`${API_BASE}/razorpay/verify-payment`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ order_id: order.id, payment_id: "pay_mock123" })
+                });
+                const payment = await payRes.json();
+                logStep(`Payment captured: ${payment.payment_id}`);
+                
+                // 3. Request Refund (triggers scoring)
+                logStep("POST /razorpay/request-refund (RECIDIAN scoring engaged)...");
+                const rfndRes = await fetch(`${API_BASE}/razorpay/request-refund`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ payment_id: payment.payment_id, amount: amt, return_reason: reason })
+                });
+                const refund = await rfndRes.json();
+                logStep(`Refund requested: ${refund.refund_id}`);
+                logStep(`--- RECIDIAN ASSESSMENT COMPLETE ---`);
+                
+                const assessment = refund.recidian_assessment;
+                updateGauge(assessment.score, assessment.risk_band, assessment.explanation);
+                
+                fetchAuditLogs();
+                
+            } catch(e) {
+                logStep(`Error: ${e.message}`);
+            }
+            
+            btn.disabled = false;
+            btn.innerText = 'Execute Refund & Score';
+        }
+
+        init();
+    </script>
+</body>
+</html>

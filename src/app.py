@@ -10,6 +10,7 @@ import razorpay
 from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 
@@ -29,6 +30,11 @@ app.add_middleware(
 os.makedirs("static", exist_ok=True)
 os.makedirs("data", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/")
+async def root():
+    """Redirect root URL directly to the dashboard."""
+    return RedirectResponse(url="/static/index.html")
 
 # --- MODEL LOADING ---
 print("Loading models and assets...")

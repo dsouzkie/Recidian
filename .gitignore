@@ -7,5 +7,3 @@ env/
 venv/
 .env
 data/*.csv
-models/*.json
-models/*.pkl

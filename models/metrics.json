@@ -1,0 +1,26 @@
+{
+    "precision": 0.9429530201342282,
+    "recall": 0.9304635761589404,
+    "f1": 0.9366666666666668,
+    "roc_auc": 0.9944220174060454,
+    "pr_auc": 0.9404263556633332,
+    "true_positives": 281,
+    "false_positives": 17,
+    "true_negatives": 3077,
+    "false_negatives": 21,
+    "total_fp_cost": 36550,
+    "total_fn_cost": 22785,
+    "total_business_cost": 59335,
+    "failure_case": {
+        "type": "False Positive",
+        "index": 26,
+        "score": 0.9814651608467102,
+        "threshold": 0.69,
+        "top_reasons": [
+            "order_to_return_days (0.0) increased risk by 4.902",
+            "return_rate_90d (1.0) increased risk by 1.362",
+            "account_age_days (42.0) increased risk by 0.869"
+        ],
+        "explanation": "The model heavily weighted one specific suspicious feature, overriding the overall safe profile of the user."
+    }
+}

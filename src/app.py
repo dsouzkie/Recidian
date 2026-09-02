@@ -139,6 +139,14 @@ class RzpRefundRequest(BaseModel):
     payment_id: str
     amount: int
     return_reason: str
+    # Optional real feature overrides (for direct scoring panel)
+    return_rate_90d: Optional[float] = None
+    orders_last_90d: Optional[int] = None
+    item_value_percentile: Optional[float] = None
+    promo_code_used: Optional[int] = None
+    account_age_days: Optional[int] = None
+    order_to_return_days: Optional[float] = None
+    same_day_reorder_after_return: Optional[int] = None
 
 # --- ENDPOINTS ---
 
@@ -309,6 +317,32 @@ def rzp_request_refund(req: RzpRefundRequest):
     # If they pick "changed_mind", we simulate a wardrober profile (fast return, high amount)
     # If they pick "damaged", we simulate a normal profile.
     
+    # If real features were passed, use them instead of the hardcoded simulation
+    if req.return_rate_90d is not None:
+        # Real features provided — use them directly
+        reason_map = {
+            "changed_mind": {"return_reason_changed_mind": 1},
+            "damaged": {"return_reason_damaged": 1},
+            "wrong_size": {"return_reason_wrong_size": 1},
+            "not_as_described": {"return_reason_not_as_described": 1},
+            "no_reason": {"return_reason_no_reason": 1},
+        }
+        reason_ohe = reason_map.get(req.return_reason, {"return_reason_nan": 1})
+        features = ScoringFeatureInput(
+            order_id="direct_score",
+            refund_id=refund_id,
+            return_rate_90d=req.return_rate_90d,
+            orders_last_90d=req.orders_last_90d or 5,
+            item_value_percentile=req.item_value_percentile or 0.5,
+            promo_code_used=req.promo_code_used or 0,
+            account_age_days=req.account_age_days or 365,
+            order_to_return_days=req.order_to_return_days or 7.0,
+            same_day_reorder_after_return=req.same_day_reorder_after_return or 0,
+            **reason_ohe
+        )
+        score_result = score_refund(features)
+        return {"refund_id": refund_id, "payment_id": req.payment_id, "status": "processed", "recidian_assessment": score_result}
+
     is_wardrober_sim = (req.return_reason == "changed_mind" and req.amount > 100000)
     
     features = ScoringFeatureInput(

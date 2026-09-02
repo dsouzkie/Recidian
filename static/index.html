@@ -435,7 +435,10 @@
             <div>
                 <div class="track-badge">Track 02: AI Risk Manager</div>
                 <h1>RECIDIAN <span>|</span> Risk Engine</h1>
-                <p class="subtitle">A strictly defense-only ML risk scorer for Razorpay refunds. Detects return abuse using a Hybrid Rule + XGBoost engine, optimized for false-positive business cost.</p>
+                <p class="subtitle" style="margin-bottom: 0.5rem;">A strictly defense-only ML risk scorer for Razorpay refunds. Detects return abuse using a Hybrid Rule + XGBoost engine, optimized for false-positive business cost.</p>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--rzp-blue); font-weight: 700; text-transform: uppercase;">
+                    Built by Christy Samuel Moses Dsouza
+                </div>
             </div>
             <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 1rem;">
                 <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #4ade80;">
@@ -611,9 +614,9 @@
 
             <!-- CHARTS -->
             <div class="card full-width">
-                <h2>Model Performance & Cost Analytics</h2>
+                <h2>Model Performance & Analytics</h2>
                 <p style="font-size: 0.9rem; color: var(--text-muted);">
-                    These metrics prove RECIDIAN meets the strict Track 02 Bar: measured precision, recall, and honest false-positive cost accounting on a held-out test set.
+                    Evaluated on an 80/20 held-out test set.
                 </p>
                 <div class="charts-grid">
                     <img src="/static/roc_curve.png" class="chart-img" alt="ROC Curve">
@@ -631,8 +634,7 @@
     <p style="font-size: 0.9rem; color: var(--text-muted);">
         We swept 99 thresholds from 0.01 to 0.99, assigning <strong>INR 2,150</strong> to each False Positive 
         (good customer blocked) and <strong>INR 1,085</strong> to each False Negative (missed fraud). 
-        The optimal threshold of <strong>0.69</strong> minimizes total business loss to <strong>INR 36,550</strong> on the held-out test set.
-        No other team in the research brief visualized this interactively.
+        The optimal threshold of <strong>0.69</strong> minimizes total business loss to <strong>INR 36,550</strong> on the test set.
     </p>
     <div style="position: relative; height: 320px;">
         <canvas id="thresholdChart"></canvas>
@@ -670,10 +672,7 @@
 <!-- ============================================================ -->
 <div class="card full-width">
     <h2>Transparency & Methodology Disclosure</h2>
-    <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:1.5rem;">
-        Every strong submission in this track explicitly disclosed what was simulated, calibrated, and planned. Here is our complete transparency statement.
-    </p>
-    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:1.5rem;">
+    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:1.5rem; margin-top: 1.5rem;">
 
         <div style="background:var(--bg-page); border-radius:12px; padding:1.5rem; border:1px solid var(--border-color);">
             <div style="font-size:1.2rem; margin-bottom:0.5rem;">⚠️ What's Simulated</div>

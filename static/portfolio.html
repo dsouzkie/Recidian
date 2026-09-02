@@ -244,29 +244,36 @@
             
             <div class="mermaid-container" style="overflow-x: auto; padding: 1rem; background: rgba(0,0,0,0.6);">
                 <div class="mermaid">
-                    %%{init: {'theme': 'base', 'themeVariables': { 'lineColor': '#bc13fe' }}}%%
-                    graph LR
-                        A[Razorpay UI] --> B(Create Order & Pay)
-                        B --> C{Refund Requested}
-                        C --> D[POST /request-refund]
-                        D --> E[FastAPI Interceptor]
+                    %%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#0a1128', 'edgeLabelBackground':'#0a1128' }}}%%
+                    graph TD
+                        subgraph Razorpay Cloud
+                            A[Razorpay Checkout] --> B(Create Order & Mock Payment)
+                            B --> C{Customer Requests Refund}
+                        end
+
+                        C -- "POST /v1/refunds" --> D[FastAPI Interceptor]
+
+                        subgraph RECIDIAN Risk Engine
+                            D --> E[Feature Synthesis Engine]
+                            E -- "OHE & Normalization" --> F{Rule Layer}
+                            
+                            F -- "Trigger: Amount > ₹1M" --> G[FLAG: HIGH RISK]
+                            F -- "Pass" --> H[XGBoost Engine]
+                            
+                            H -- "Risk Probability" --> I[SHAP Explainer]
+                            I -- "Decomposed Features" --> J{Score >= 0.69?}
+                        end
+
+                        J -- "Yes (High Risk)" --> K[Fire Webhook: Block Refund]
+                        J -- "No (Low Risk)" --> L[Fire Webhook: Approve Refund]
                         
-                        E --> F{Rule Layer}
-                        F -->|Trigger| G[FLAG: HIGH RISK]
-                        F -->|Pass| H[XGBoost Engine]
-                        
-                        H --> I[SHAP Explainer]
-                        I --> J{Score >= 0.69?}
-                        J -->|Yes| K[Webhook Alert]
-                        J -->|No| L[Approve Return]
-                        
-                        G -.-> M[(SQLite Audit)]
+                        G -.-> M[(SQLite Immutable Audit Log)]
                         K -.-> M
                         L -.-> M
-                        
-                        classDef default fill:#050914,stroke:#00f3ff,stroke-width:2px,color:#00f3ff,rx:8,ry:8;
-                        classDef ml fill:#0a0514,stroke:#bc13fe,stroke-width:2px,color:#bc13fe,rx:8,ry:8;
-                        classDef db fill:#05140a,stroke:#22c55e,stroke-width:2px,color:#22c55e,rx:8,ry:8;
+
+                        classDef default fill:#0a1128,stroke:#00f3ff,stroke-width:2px,color:#fff,rx:8,ry:8;
+                        classDef ml fill:#140514,stroke:#bc13fe,stroke-width:2px,color:#fff,rx:8,ry:8;
+                        classDef db fill:#05140a,stroke:#22c55e,stroke-width:2px,color:#fff,rx:8,ry:8;
                         
                         class H,I ml;
                         class M db;

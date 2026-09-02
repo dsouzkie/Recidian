@@ -38,13 +38,45 @@
 ## Current Session State
 
 ```
-CURRENT BLOCK:      Block 9-11 — Deployment & Polish
-LAST COMPLETED:     Block 8 — Dashboard Frontend
-TIME SPENT:         0.9 hours
-FILES CREATED:      static/index.html, src/app.py
+CURRENT BLOCK:      Block 9-11 — Deployment & Polish [COMPLETED]
+LAST COMPLETED:     Block 11 — Project Wrap-up
+TIME SPENT:         1.2 hours
+FILES CREATED:      static/index.html, src/app.py, README.md, Dockerfile
 KNOWN ISSUES:       None
-NEXT ACTION:        Write README.md and wrap up
+NEXT ACTION:        None (Project Complete)
 ```
+
+---
+
+### Phase 3: Live Application & Webhook (FastAPI) [COMPLETED]
+- [x] **Block 7: Live FastAPI Server & Webhooks**
+  - [x] Task 7.1: Setup `app.py` with FastAPI & CORS.
+  - [x] Task 7.2: Build SQLite Audit Log DB (`init_db`).
+  - [x] Task 7.3: Implement `/razorpay/create-order` mapping to Live Test Razorpay Orders API.
+  - [x] Task 7.4: Implement `/razorpay/verify-payment` mock-capture.
+  - [x] Task 7.5: Implement `/razorpay/request-refund` wrapping Live Test Razorpay Refunds API.
+  - [x] Task 7.6: Inject Model Scoring & Threshold logic into Refund intercept.
+  - [x] Task 7.7: Simulate Webhook payload emission to console for High-Risk.
+
+### Phase 4: UI & End-to-End Demo [COMPLETED]
+- [x] **Block 8: Web Dashboard (`index.html`)**
+  - [x] Task 8.1: Create HTML structure serving via FastAPI StaticFiles.
+  - [x] Task 8.2: Build UI Form (Amount, Return Reason).
+  - [x] Task 8.3: Build "Risk Gauge" CSS Component.
+  - [x] Task 8.4: Build SHAP Explainer output view.
+  - [x] Task 8.5: Build Live SQLite Audit Table auto-refresh.
+  - [x] Task 8.6: Final Polish: Complete White/Blue UI Overhaul for Enterprise aesthetic.
+  - [x] Task 8.7: Add separate `portfolio.html` methodology deep-dive.
+
+### Phase 5: Submission & Polish [COMPLETED]
+- [x] **Block 9: Packaging & Readme**
+  - [x] Task 9.1: Write `requirements.txt`.
+  - [x] Task 9.2: Create `Dockerfile` for Hugging Face / Render compatibility.
+  - [x] Task 9.3: Write `README.md` (Setup, Architecture Mermaid, Metrics).
+- [x] **Block 10: Validation Run**
+  - [x] Task 10.1: Run End-to-End test locally (Low Risk vs High Risk triggers).
+  - [x] Task 10.2: Deploy to Render.com Cloud Platform.
+  - [x] Task 10.3: Push Code to GitHub (`dsouzkie/Recidian`).
 
 ---
 

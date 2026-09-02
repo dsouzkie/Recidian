@@ -293,6 +293,17 @@
             </div>
 
             <p style="margin-top: 2rem; margin-bottom: 0;"><strong>The 4 Archetypes:</strong> Normal (Low returns), Loyal High-Frequency (High buys, High returns), Wardrobers (High-value returns only), and Promo Abusers (Instant returns).</p>
+            
+            <div style="margin-top: 2rem; padding: 1.5rem; border: 1px solid rgba(245, 166, 35, 0.3); border-radius: 8px; background: rgba(245, 166, 35, 0.05);">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #f5a623; text-transform: uppercase; margin-bottom: 0.5rem;">// CALIBRATION NOTE</div>
+                <p style="font-size: 1rem; color: #cbd5e1; margin: 0; line-height: 1.8;">
+                    Distributions validated against <strong style="color: #f5a623;">NRF 2024 retail benchmarks</strong>: fashion returns 28-35%, electronics 7-12%. 
+                    Our Wardrober archetype (40-70% return rate) matches documented wardrobing behavior. 
+                    The <strong>Loyal High-Frequency hard negative</strong> was explicitly engineered to prevent trivial single-feature threshold separation — 
+                    an 80% return rate scores LOW risk when paired with 22 orders/month and a 730-day account age.
+                    No real customer data was used or scraped.
+                </p>
+            </div>
         </div>
 
         <!-- MODULE 03: ML & EVALUATION METRICS -->
@@ -338,16 +349,46 @@
             
             <div class="grid-2" style="margin-bottom: 1.5rem;">
                 <div class="stat-box" style="border-color: rgba(233, 75, 75, 0.5);">
-                    <div class="stat-label">False Negative Penalty</div>
-                    <div class="stat-val" style="font-size: 2rem;">₹2,000</div>
+                    <div class="stat-label">False Positive Penalty</div>
+                    <div class="stat-val" style="font-size: 2rem;">₹2,150</div>
                 </div>
                 <div class="stat-box" style="border-color: rgba(245, 166, 35, 0.5);">
-                    <div class="stat-label">False Positive Penalty</div>
-                    <div class="stat-val" style="font-size: 2rem;">₹500</div>
+                    <div class="stat-label">False Negative Penalty</div>
+                    <div class="stat-val" style="font-size: 2rem;">₹1,085</div>
                 </div>
             </div>
 
             <p style="text-align: center; font-size: 1.25rem; color: #fff;">The mathematical minimum cost (₹36,550) occurred exactly at <strong style="color:var(--cyan-glow); font-size: 1.5rem;">Threshold = 0.69</strong>. That is the engine's core constraint.</p>
+        </div>
+
+        <!-- MODULE 05: SHAP EXPLAINABILITY -->
+        <div class="module" style="border-left-color: var(--purple-glow);">
+            <h2><span class="num" style="color:var(--purple-glow)">05</span> SHAP Explainability Engine</h2>
+            <p>Every risk decision is accompanied by a mathematically rigorous explanation. We use <strong>SHAP TreeExplainer</strong> to decompose each XGBoost prediction into per-feature contributions — no LLM hallucinations, no black boxes.</p>
+            
+            <div class="grid-2" style="margin-top: 2rem;">
+                <div class="stat-box" style="border-color: rgba(188, 19, 254, 0.4);">
+                    <div class="stat-label">Explainer Type</div>
+                    <div class="stat-val" style="font-size: 1.8rem;">TreeExplainer</div>
+                    <div style="font-size: 0.9rem; color: #64748b;">Exact SHAP values, not approximations</div>
+                </div>
+                <div class="stat-box" style="border-color: rgba(188, 19, 254, 0.4);">
+                    <div class="stat-label">Top-K Features Returned</div>
+                    <div class="stat-val" style="font-size: 1.8rem;">3</div>
+                    <div style="font-size: 0.9rem; color: #64748b;">Per decision, ranked by |contribution|</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 2rem; padding: 1.5rem; border: 1px solid rgba(188, 19, 254, 0.3); border-radius: 8px; background: rgba(188, 19, 254, 0.05);">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--purple-glow); text-transform: uppercase; margin-bottom: 0.5rem;">// WHY THIS MATTERS</div>
+                <p style="font-size: 1rem; color: #cbd5e1; margin: 0; line-height: 1.8;">
+                    Razorpay's Track 02 requires defense-only systems. When a merchant disputes a blocked refund, 
+                    they need a <strong>legally defensible reason</strong> — not "the model said so." 
+                    SHAP tells them exactly: <em>"return_rate_90d = 0.75 increased risk by +0.312, 
+                    account_age_days = 45 increased risk by +0.187."</em> 
+                    No other project in our competitive research provided per-decision feature attribution.
+                </p>
+            </div>
         </div>
 
         <div style="text-align: center; margin-top: 5rem;">

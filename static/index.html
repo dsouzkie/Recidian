@@ -648,6 +648,7 @@
                 <table class="data-table">
                     <thead>
                         <tr>
+                            <th>Source</th>
                             <th>Order ID</th>
                             <th>Refund ID</th>
                             <th>Risk Score</th>
@@ -782,7 +783,12 @@
                     if(log.band === 'High') bandClass = 'risk-band--high';
                     if(log.band === 'Medium') bandClass = 'risk-band--medium';
                     
+                    const sourceTag = (log.order_id && log.order_id.startsWith('direct_score')) 
+                        ? '<span style="background:var(--rzp-blue); color:white; padding:3px 8px; border-radius:4px; font-size:0.7rem; font-weight:700;">DIRECT TEST</span>' 
+                        : '<span style="background:#475569; color:white; padding:3px 8px; border-radius:4px; font-size:0.7rem; font-weight:700;">LIVE WEBHOOK</span>';
+
                     tr.innerHTML = `
+                        <td>${sourceTag}</td>
                         <td>${log.order_id || 'N/A'}</td>
                         <td>${log.refund_id || 'N/A'}</td>
                         <td style="font-weight: 700;">${(log.score * 100).toFixed(1)}%</td>

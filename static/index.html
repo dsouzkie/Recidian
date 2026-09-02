@@ -476,6 +476,87 @@
             </div>
         </div>
 
+
+<!-- ============================================================ -->
+<!-- PRIORITY 1: REAL SCORING PANEL — calls POST /score directly  -->
+<!-- ============================================================ -->
+<div class="card full-width" id="scoring-panel" style="border: 2px solid var(--rzp-blue); margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+        <div>
+            <h2 style="margin: 0 0 0.25rem 0;">Score Engine — Direct ML Risk Assessment</h2>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0;">
+                Calls <code>POST /score</code> directly with real feature values you control. 
+                The Razorpay demo below uses this same engine internally.
+            </p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button onclick="loadScenario('normal')" style="background:#e8f5e9; color:#1b5e20; border:1px solid #a5d6a7; padding:0.4rem 0.8rem; border-radius:6px; font-size:0.8rem; font-weight:600; cursor:pointer;">Normal Customer</button>
+            <button onclick="loadScenario('wardrober')" style="background:#fce4ec; color:#880e4f; border:1px solid #f48fb1; padding:0.4rem 0.8rem; border-radius:6px; font-size:0.8rem; font-weight:600; cursor:pointer;">Wardrober</button>
+            <button onclick="loadScenario('loyalhf')" style="background:#e3f2fd; color:#0d47a1; border:1px solid #90caf9; padding:0.4rem 0.8rem; border-radius:6px; font-size:0.8rem; font-weight:600; cursor:pointer;">Loyal High-Freq ★</button>
+        </div>
+    </div>
+
+    <!-- Input Controls -->
+    <div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+            <div class="form-group">
+                <label>Return Rate (90d) <span id="rr_val" style="color:var(--rzp-blue); font-weight:700;">0.10</span></label>
+                <input type="range" id="sp_rr" min="0" max="1" step="0.01" value="0.10"
+                    oninput="document.getElementById('rr_val').innerText = parseFloat(this.value).toFixed(2)"
+                    style="width:100%; accent-color: var(--rzp-blue);">
+            </div>
+            <div class="form-group">
+                <label>Item Value Percentile <span id="ivp_val" style="color:var(--rzp-blue); font-weight:700;">0.50</span></label>
+                <input type="range" id="sp_ivp" min="0" max="1" step="0.01" value="0.50"
+                    oninput="document.getElementById('ivp_val').innerText = parseFloat(this.value).toFixed(2)"
+                    style="width:100%; accent-color: var(--rzp-blue);">
+            </div>
+            <div class="form-group">
+                <label>Orders Last 90 Days</label>
+                <input type="number" id="sp_orders" value="5" min="1" max="50" style="width:100%;">
+            </div>
+            <div class="form-group">
+                <label>Account Age (Days)</label>
+                <input type="number" id="sp_age" value="365" min="1" max="1500" style="width:100%;">
+            </div>
+            <div class="form-group">
+                <label>Days to Return</label>
+                <input type="number" id="sp_days" value="7" min="0" max="90" style="width:100%;">
+            </div>
+            <div class="form-group">
+                <label>Return Reason</label>
+                <select id="sp_reason" style="width:100%;">
+                    <option value="changed_mind">Changed Mind</option>
+                    <option value="damaged">Item Damaged</option>
+                    <option value="wrong_size">Wrong Size</option>
+                    <option value="not_as_described">Not as Described</option>
+                    <option value="no_reason">No Reason Given</option>
+                </select>
+            </div>
+            <div class="form-group" style="display:flex; align-items:center; gap:0.5rem;">
+                <label style="margin:0;">Promo Code Used?</label>
+                <input type="checkbox" id="sp_promo" style="width:20px; height:20px; accent-color:var(--rzp-blue);">
+            </div>
+            <div class="form-group" style="display:flex; align-items:center; gap:0.5rem;">
+                <label style="margin:0;">Same-Day Reorder?</label>
+                <input type="checkbox" id="sp_reorder" style="width:20px; height:20px; accent-color:var(--rzp-blue);">
+            </div>
+        </div>
+        <div style="display: flex; gap: 1rem; margin-top: 1rem; align-items: center;">
+            <button onclick="runScorePanel()" id="sp_btn"
+                style="flex: 1; background: var(--rzp-blue); color: white; border: none; padding: 0.9rem; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer;">
+                Run Risk Score → (Updates Gauge Below)
+            </button>
+            <div id="sp_note" style="flex: 1; font-size: 0.85rem; color: var(--text-muted); font-style: italic;">
+                Select a scenario or fill in values, then click "Run Risk Score"
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ============================================================ -->
+<!-- END PRIORITY 1 SCORING PANEL                                 -->
+<!-- ============================================================ -->
+
         <!-- DASHBOARD GRID -->
         <div class="dashboard-grid">
             
@@ -505,91 +586,6 @@
                 
                 <div id="demo_logs" class="console-log">> System ready. Waiting for execution...</div>
             </div>
-
-<!-- ============================================================ -->
-<!-- PRIORITY 1: REAL SCORING PANEL — calls POST /score directly  -->
-<!-- DO NOT REMOVE OR MODIFY EXISTING CARDS ABOVE OR BELOW        -->
-<!-- ============================================================ -->
-<div class="card full-width" id="scoring-panel" style="border: 2px solid var(--rzp-blue);">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
-        <div>
-            <h2 style="margin: 0 0 0.25rem 0;">Score Engine — Direct ML Risk Assessment</h2>
-            <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0;">
-                Calls <code>POST /score</code> directly with real feature values you control. 
-                The Razorpay demo above uses this same engine internally.
-            </p>
-        </div>
-        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <button onclick="loadScenario('normal')" style="background:#e8f5e9; color:#1b5e20; border:1px solid #a5d6a7; padding:0.4rem 0.8rem; border-radius:6px; font-size:0.8rem; font-weight:600; cursor:pointer;">Normal Customer</button>
-            <button onclick="loadScenario('wardrober')" style="background:#fce4ec; color:#880e4f; border:1px solid #f48fb1; padding:0.4rem 0.8rem; border-radius:6px; font-size:0.8rem; font-weight:600; cursor:pointer;">Wardrober</button>
-            <button onclick="loadScenario('loyalhf')" style="background:#e3f2fd; color:#0d47a1; border:1px solid #90caf9; padding:0.4rem 0.8rem; border-radius:6px; font-size:0.8rem; font-weight:600; cursor:pointer;">Loyal High-Freq ★</button>
-        </div>
-    </div>
-
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-        <!-- LEFT: Input Controls -->
-        <div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <div class="form-group">
-                    <label>Return Rate (90d) <span id="rr_val" style="color:var(--rzp-blue); font-weight:700;">0.10</span></label>
-                    <input type="range" id="sp_rr" min="0" max="1" step="0.01" value="0.10"
-                        oninput="document.getElementById('rr_val').innerText = parseFloat(this.value).toFixed(2)"
-                        style="width:100%; accent-color: var(--rzp-blue);">
-                </div>
-                <div class="form-group">
-                    <label>Item Value Percentile <span id="ivp_val" style="color:var(--rzp-blue); font-weight:700;">0.50</span></label>
-                    <input type="range" id="sp_ivp" min="0" max="1" step="0.01" value="0.50"
-                        oninput="document.getElementById('ivp_val').innerText = parseFloat(this.value).toFixed(2)"
-                        style="width:100%; accent-color: var(--rzp-blue);">
-                </div>
-                <div class="form-group">
-                    <label>Orders Last 90 Days</label>
-                    <input type="number" id="sp_orders" value="5" min="1" max="50" style="width:100%;">
-                </div>
-                <div class="form-group">
-                    <label>Account Age (Days)</label>
-                    <input type="number" id="sp_age" value="365" min="1" max="1500" style="width:100%;">
-                </div>
-                <div class="form-group">
-                    <label>Days to Return</label>
-                    <input type="number" id="sp_days" value="7" min="0" max="90" style="width:100%;">
-                </div>
-                <div class="form-group">
-                    <label>Return Reason</label>
-                    <select id="sp_reason" style="width:100%;">
-                        <option value="changed_mind">Changed Mind</option>
-                        <option value="damaged">Item Damaged</option>
-                        <option value="wrong_size">Wrong Size</option>
-                        <option value="not_as_described">Not as Described</option>
-                        <option value="no_reason">No Reason Given</option>
-                    </select>
-                </div>
-                <div class="form-group" style="display:flex; align-items:center; gap:0.5rem;">
-                    <label style="margin:0;">Promo Code Used?</label>
-                    <input type="checkbox" id="sp_promo" style="width:20px; height:20px; accent-color:var(--rzp-blue);">
-                </div>
-                <div class="form-group" style="display:flex; align-items:center; gap:0.5rem;">
-                    <label style="margin:0;">Same-Day Reorder?</label>
-                    <input type="checkbox" id="sp_reorder" style="width:20px; height:20px; accent-color:var(--rzp-blue);">
-                </div>
-            </div>
-            <button onclick="runScorePanel()" id="sp_btn"
-                style="width:100%; margin-top:1rem; background: var(--rzp-blue); color: white; border: none; padding: 0.9rem; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer;">
-                Run Risk Score →
-            </button>
-        </div>
-
-        <!-- RIGHT: Result Display -->
-        <div id="sp_result" style="display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--bg-page); border-radius:12px; padding:1.5rem; min-height:280px;">
-            <div style="color:var(--text-muted); font-style:italic; text-align:center;">
-                Select a scenario or fill in values, then click "Run Risk Score"
-            </div>
-        </div>
-    </div>
-</div>
-<!-- ============================================================ -->
-<!-- END PRIORITY 1 SCORING PANEL                                 -->
-<!-- ============================================================ -->
 
             <!-- RISK ENGINE COLUMN -->
             <div class="card">
@@ -961,12 +957,7 @@ function loadScenario(name) {
     document.getElementById('sp_reorder').checked = s.same_day_reorder_after_return === 1;
 
     // Show scenario note
-    document.getElementById('sp_result').innerHTML = `
-        <div style="text-align:center; padding:1rem; background: rgba(51,133,255,0.05); border-radius:8px; border:1px solid rgba(51,133,255,0.2);">
-            <div style="font-weight:700; color:var(--rzp-blue); margin-bottom:0.5rem;">${s.label}</div>
-            <div style="font-size:0.85rem; color:var(--text-muted);">${s.note}</div>
-            <div style="margin-top:1rem; font-size:0.8rem; color:var(--text-muted);">Click "Run Risk Score" to execute</div>
-        </div>`;
+    document.getElementById('sp_note').innerHTML = `<strong>${s.label}:</strong> ${s.note}`;
 }
 
 async function runScorePanel() {
@@ -1006,34 +997,13 @@ async function runScorePanel() {
         });
         const result = await res.json();
 
-        const pct = Math.round(result.score * 100);
-        const colors = { High: '#e94b4b', Medium: '#f5a623', Low: '#0fa457' };
-        const color = colors[result.risk_band] || '#3385ff';
-
-        let shapHTML = '';
-        if (result.explanation && result.explanation.length > 0) {
-            shapHTML = result.explanation.map(sv => {
-                const isUp = sv.contribution > 0;
-                return `<div style="display:flex; justify-content:space-between; padding:0.35rem 0; border-bottom:1px solid var(--border-color); font-size:0.82rem;">
-                    <span style="font-family:'JetBrains Mono',monospace;">${sv.feature}</span>
-                    <span style="color:${isUp ? '#e94b4b' : '#0fa457'}; font-weight:700;">${isUp ? '↑' : '↓'} ${sv.contribution.toFixed(3)}</span>
-                </div>`;
-            }).join('');
-        }
-
-        document.getElementById('sp_result').innerHTML = `
-            <div style="text-align:center; width:100%;">
-                <div style="font-size:3rem; font-weight:800; color:${color}; line-height:1;">${pct}%</div>
-                <div style="font-size:1rem; font-weight:700; color:${color}; margin:0.5rem 0 1rem;">${result.risk_band.toUpperCase()} RISK — via ${result.triggered_by}</div>
-                <div style="text-align:left; width:100%;">
-                    <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:0.5rem;">SHAP Feature Contributions</div>
-                    ${shapHTML || '<div style="color:var(--text-muted); font-style:italic;">Rule-based trigger (no SHAP)</div>'}
-                </div>
-            </div>`;
+        // Wire to the main gauge so there's only one unified result display
+        updateGauge(result.score, result.risk_band, result.explanation);
 
         fetchAuditLogs();
+        document.getElementById('sp_note').innerHTML = `<span style="color:#0fa457; font-weight:700;">Score updated! Check the gauge below.</span>`;
     } catch(e) {
-        document.getElementById('sp_result').innerHTML = `<div style="color:#e94b4b;">Error: ${e.message}</div>`;
+        document.getElementById('sp_note').innerHTML = `<span style="color:#e94b4b;">Error: ${e.message}</span>`;
     }
 
     btn.disabled = false;

@@ -11,7 +11,6 @@ COPY src/ ./src/
 COPY data/ ./data/
 COPY models/ ./models/
 COPY static/ ./static/
-COPY metrics_report.md .
 COPY README.md .
 
 # Expose port for FastAPI

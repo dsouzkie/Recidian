@@ -19,23 +19,44 @@ We explicitly targeted **Return Abuse** (Wardrobing, Promo-exploitation, Serial 
 
 ---
 
-## ⚡ Key USPs & Features
-
-1. **Business Cost Optimization (Not just "Accuracy"):** We didn't optimize for arbitrary ML accuracy. We assigned a financial penalty to False Positives (insulting a good customer) and False Negatives (shipping cost + loss), sweeping 99 thresholds to find the mathematical minimum business loss at exactly **Threshold = 0.69**.
-2. **SHAP Explainability (No Black Boxes):** In real FinTech, freezing money blindly is a compliance nightmare. We integrated a SHAP `TreeExplainer`. Every prediction outputs exact feature contributions (e.g., *"Blocked because the user's 90-day return rate is 80%"*), ensuring total operational transparency.
-3. **Hybrid Scoring Architecture:** We built a hardcoded rule layer for 0ms instant triggers (speed), backed by a powerful XGBoost Classifier for complex, non-linear pattern recognition.
-4. **Archetype-Driven Synthetic Data:** We reverse-engineered Razorpay API schemas to generate 20,400+ transactions. We purposely injected a "Loyal High-Frequency Shopper" archetype as a *hard negative* to force the model to learn nuanced behaviors, rather than just banning everyone who returns an item.
+## 🛠️ Tech Stack
+* **Backend:** FastAPI, Python, Uvicorn
+* **Machine Learning:** XGBoost, SHAP (TreeExplainer), Scikit-Learn, Pandas
+* **Frontend:** HTML5, CSS3, Vanilla JS, Chart.js
+* **Integrations:** Razorpay Test API Webhooks
+* **Database / Audit:** SQLite3
 
 ---
 
-## 📊 Evaluation Metrics (Held-Out Test Set)
+## ⚡ Key USPs & Features
+
+1. **Business Cost Optimization (Not just "Accuracy"):** We didn't optimize for arbitrary ML accuracy. We assigned a financial penalty to False Positives and False Negatives, sweeping 99 thresholds to find the mathematical minimum business loss.
+2. **SHAP Explainability (No Black Boxes):** In real FinTech, freezing money blindly is a compliance nightmare. We integrated a SHAP `TreeExplainer`. Every prediction outputs exact feature contributions (e.g., *"Blocked because the user's 90-day return rate is 80%"*), ensuring total operational transparency.
+3. **Hybrid Scoring Architecture:** We built a hardcoded rule layer for 0ms instant triggers (speed), backed by a powerful XGBoost Classifier for complex, non-linear pattern recognition.
+
+---
+
+## 🧠 Deep Dive: Data Archetypes & "Hard Negatives"
+Because real fraud data is proprietary, we synthesized 20,400+ transactions mirroring Razorpay's API schemas, calibrated strictly to NRF 2024 retail benchmarks. We built four strict behavioral profiles:
+* **Normal Customers:** Low return rate, standard account age.
+* **Wardrobers:** High-value items, returned within 1-2 days for "Changed Mind".
+* **Promo Abusers:** High promo code usage, immediate returns to harvest discounts.
+* **The "Hard Negative" (Loyal High-Freq):** We intentionally engineered customers with massive 80% return rates but extremely high order volume (22+ orders/month) and old accounts. This forced the XGBoost model to learn complex multi-feature matrices rather than relying on a lazy, single-variable threshold.
+
+---
+
+## 💸 Deep Dive: The Cost Matrix & Thresholding
+We evaluated the model on an 80/20 held-out test set. To determine the optimal threshold, we ran a mathematical cost sweep:
+* **False Positive Penalty:** `₹2,150` (The cost of insulting a good customer, lifetime value loss, and friction).
+* **False Negative Penalty:** `₹1,085` (The cost of return shipping + average item loss to a fraudster).
+
+**Results:** The engine found that a strict classification **Threshold of 0.69** minimized total business loss to exactly `₹36,550` on the test set.
+
 | Metric | Value | Meaning |
 |---|---|---|
 | **Precision** | `94.3%` | When we flag a refund as high-risk, we are correct 94.3% of the time. |
 | **Recall** | `93.0%` | We caught 93.0% of all abusive returns in the dataset. |
-| **ROC-AUC** | `0.994` | The model has excellent class separation capability. |
 | **PR-AUC** | `0.940` | Highly resilient even against class imbalance. |
-| **Business Cost**| `INR 36,550` | The minimum possible loss achieved on the test set via Threshold Sweep. |
 
 ---
 
@@ -100,7 +121,7 @@ graph TD
    python -m uvicorn src.app:app --host 0.0.0.0 --port 8000
    ```
 5. **View the Dashboard**
-   Navigate to `http://localhost:8000` (which auto-redirects to the dashboard).
+   Navigate to `http://localhost:8000`.
 
 ---
 

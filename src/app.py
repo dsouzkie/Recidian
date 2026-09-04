@@ -329,7 +329,7 @@ def rzp_request_refund(req: RzpRefundRequest):
         }
         reason_ohe = reason_map.get(req.return_reason, {"return_reason_nan": 1})
         features = ScoringFeatureInput(
-            order_id="direct_score",
+            order_id=req.payment_id.replace("pay_mock_", "order_") if req.payment_id.startswith("pay_mock_") else f"order_{req.payment_id[:6]}",
             refund_id=refund_id,
             return_rate_90d=req.return_rate_90d,
             orders_last_90d=req.orders_last_90d or 5,
